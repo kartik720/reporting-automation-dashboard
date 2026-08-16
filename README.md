@@ -6,12 +6,15 @@ synthetic multi-platform data for four fictional clients. Modeled on
 real manual cross-platform reporting work — the goal was to automate
 what used to be a spreadsheet stitched together by hand every month.
 
-Third project in a series: [RFM Segmentation](#) (SQL/Python) →
-[Tableau Marketing Analytics Dashboard](#) → this one. Where the first
-two covered analysis and BI visualization, this project targets
-spreadsheet engineering and workflow automation specifically.
+Third project in a series: [RFM Segmentation](https://github.com/kartik720/rfm-segmentation) (SQL/Python) →
+Tableau Marketing Analytics Dashboard
+([Campaign Performance](https://public.tableau.com/views/marketing-campaign-performance/CampaignPerformanceOverview) /
+[Social Media Engagement](https://public.tableau.com/views/social_media_engagement/SocialMediaOverview))
+→ this one. Where the first two covered analysis and BI visualization,
+this project targets spreadsheet engineering and workflow automation
+specifically.
 
-**[Open the live dashboard →](#)** *((https://docs.google.com/spreadsheets/d/1QoUyExvuSc7Q-9Rwma-AdPDiGOgiB44eRMSqh-ZAytI/edit?usp=sharing))*
+**[Open the live dashboard →](https://docs.google.com/spreadsheets/d/1QoUyExvuSc7Q-9Rwma-AdPDiGOgiB44eRMSqh-ZAytI/edit?usp=sharing)**
 
 ---
 
@@ -91,8 +94,8 @@ data/            synthetic CSV exports
 notebooks/       data generation (Python/Jupyter)
 apps_script/     Report Generator, PDF export, alerts, custom date input
 docs/            reporting-automation-spec.md, google_sheets_cheat_sheet.md,
-                 python_cheat_sheet.md, cheat_sheet.md
-images/          screenshots
+                 python_cheat_sheet.md
+images/          dashboard screenshots, python-generated charts
 ```
 
 ---
@@ -115,6 +118,7 @@ images/          screenshots
   data source exists for it to refresh into; a scheduled trigger
   re-checking a static dataset would only ever produce the same result.
 
-See `docs/reporting-automation-spec.md` for the full build log, every
-design decision and its reasoning, and `docs/cheat_sheet.md` for
-interview-focused talking points.
+See `docs/reporting-automation-spec.md` for the full build log and
+every design decision with its reasoning, and
+`docs/google_sheets_cheat_sheet.md` / `docs/python_cheat_sheet.md` for
+a technique-by-technique walkthrough of how each piece was built.
