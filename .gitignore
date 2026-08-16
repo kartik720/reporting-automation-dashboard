@@ -1,0 +1,14 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+
+# macOS AppleDouble files (external/exFAT drive artifacts)
+._*
+.DS_Store
+.Spotlight-V100
+.Trashes
+
+docs/cheat_sheet.md
+docs/python_deep_dive.md
