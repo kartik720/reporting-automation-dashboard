@@ -620,8 +620,3 @@ mismatch several steps later inside a Google Sheets formula.
   are moving in offsetting directions
 
 ---
-
-*Companion to `python_deep_dive.md` (the build-log version, with
-iteration history and reasoning Q&A) and `reporting-automation-spec.md`
-(the decisions-and-why doc). This file teaches the finished code;
-`python_deep_dive.md` explains how it got built.*

@@ -852,10 +852,3 @@ named, only where it sits.
   laid-out ones
 
 ---
-
-*Companion to `python_cheat_sheet.md` (same teaching approach, covering
-the notebook) and `reporting-automation-spec.md` (the decisions-and-why
-doc). This document is now complete — the dashboard build (KPI
-cards, conditional formatting, all Apps Script add-ons, the
-posting-cadence correlation view, and the aesthetician GA/store section)
-is finished end to end.*

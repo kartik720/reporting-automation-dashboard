@@ -237,4 +237,3 @@ Worth remembering beyond this project, not just project-specific trivia:
 9. ~~Polish, publish, documentation~~ ✅ **DONE.** Notebook markdown-cleanup pass completed — rebuilt as a fully standalone document with zero cross-references to any external doc, every markdown cell and code comment naming a spec section or another file rewritten, code comments standardized to a consistent `# ---- Section ----` header style throughout. A full per-sheet number-formatting and conditional-formatting pass, plus uniform column/row sizing (150px columns, 25px rows, 35px header rows), completed as unscoped polish. All docs finalized; repo published to GitHub.
 
 ---
-*Living document — update as decisions change during the build. Build Phases (§13) stays as the last section on every future update.*
