@@ -451,8 +451,9 @@ separate systems:
 
 ## Cells 13–15 — Injecting one "bad month" per client
 
-**The big idea:** a portfolio dashboard with only smooth, boring, ever-
-increasing numbers doesn't demonstrate anything interesting. These three
+**The big idea:** a dataset with only smooth, boring, ever-increasing
+numbers gives the dashboard's conditional-formatting and anomaly logic
+nothing real to catch. These three
 cells each inject one realistic negative event into one client's data —
 different scenario, different mechanism, different timing for each, so
 they don't read as three copies of the same trick.

@@ -1,15 +1,14 @@
 # Automated Multi-Platform Client Reporting Dashboard — Project Spec
 
-**Status:** Google Sheets dashboard build is **complete**. KPI cards (§6, Build Phase 5), YoY conditional formatting flags (§6, Build Phase 6), Report Generator + PDF export + auto-alert system (§7, add-ons #1–#2, Build Phase 7 — Apps Script), posting-cadence correlation view + native pivot table (§7, add-on #3, Build Phase 8), and the aesthetician-only GA/store conditional section are all built, tested, and confirmed working. Auto-refresh (originally add-on/Phase 7 item) was deliberately cut — see §7 note. A full per-sheet number-formatting and conditional-formatting pass, plus column/row sizing and a custom-date-range input flow (Apps Script `onEdit` trigger with format-validated prompts), were completed as polish beyond the original scope. **Remaining: Build Phase 9 — `cheat_sheet.md` and `README.md`.**
+**Status:** Complete and published. Google Sheets dashboard, Apps Script automations (Report Generator, PDF export, per-client email alerts), the posting-cadence correlation view, and the aesthetician-only GA/store conditional section are all built, tested, and live. A full per-sheet number-formatting and conditional-formatting pass, plus column/row sizing and a custom-date-range input flow (Apps Script `onEdit` trigger with format-validated prompts), were completed as polish beyond the original scope.
 **Tool:** Google Sheets + Apps Script (no Excel/Power Query — see §8)
 **Time range:** 2 years of synthetic post-level + funnel data (2024-01-01 to 2025-12-31), enabling year-over-year comparison as a showcased feature
-
 
 ---
 
 ## 1. Why this project
 
-Extends the same real-world story as the Marketing Analytics Dashboard (Tableau) — the manual cross-platform reporting grind at MyCreationLab — but closes a skill gap neither existing portfolio project covers: **spreadsheet engineering and workflow automation** (advanced formulas, dynamic dashboards, Apps Script-driven automation). Where the Tableau project shows BI/visualization skill, this one shows the "build the tool that replaces the manual work" skill — a distinct, resume-worthy line.
+Extends the same real-world story as the Marketing Analytics Dashboard (Tableau) — the manual cross-platform reporting grind at MyCreationLab — but closes a skill gap neither of the other two projects covers: **spreadsheet engineering and workflow automation** (advanced formulas, dynamic dashboards, Apps Script-driven automation). Where the Tableau project shows BI/visualization skill, this one shows the "build the tool that replaces the manual work" skill.
 
 ## 2. Clients & channel mix
 
@@ -43,7 +42,7 @@ Platform-native metrics, rolled up into shared columns for the unified cross-pla
 
 ## 4. Funnel / conversion layer (tiered by client — asymmetric on purpose)
 
-One deep full-funnel flagship + three lightweight, business-relevant conversion metrics. Full parity across all four was considered and deliberately rejected — it would quadruple the data/joining work for diminishing resume value.
+One deep full-funnel flagship + three lightweight, business-relevant conversion metrics. Full parity across all four was considered and deliberately rejected — it would quadruple the data/joining work without adding a meaningfully different technique to demonstrate.
 
 | Client | Conversion layer | Data source |
 |---|---|---|
@@ -59,7 +58,7 @@ One deep full-funnel flagship + three lightweight, business-relevant conversion 
 2. **Cadence independence check (Cells 2–3):** confirm posts/week is a genuinely independent input, not derived from the same formula that drives engagement — otherwise the future posting-cadence correlation view (§7.3) would be circular, discovering a relationship that was accidentally baked in.
 3. **Shared schema columns** (above) built into all three new clients from the start.
 
-**Honesty note on the aesthetician's social→sales link:** because this link is coded into the generator (social-sourced sessions get their own conversion mechanic), it's *causal by construction* in this dataset — not something discovered from evidence, the way it would be on real data. The "correlation, not causation" framing describes the right *analysis technique* to demonstrate on the dashboard (posting-cadence vs. performance, traffic-source vs. revenue, etc.) — but if asked directly, the honest answer is that this project demonstrates *how to investigate* that relationship on real data, not proof that social drives sales here.
+**Honesty note on the aesthetician's social→sales link:** because this link is coded into the generator (social-sourced sessions get their own conversion mechanic), it's *causal by construction* in this dataset — not something discovered from evidence, the way it would be on real data. The "correlation, not causation" framing describes the right *analysis technique* to demonstrate on the dashboard (posting-cadence vs. performance, traffic-source vs. revenue, etc.) — but the honest caveat is that this project demonstrates *how to investigate* that relationship on real data, not proof that social drives sales here.
 
 ## 5. Seasonality (international/generic market, 2-year range)
 
@@ -76,9 +75,9 @@ One deep full-funnel flagship + three lightweight, business-relevant conversion 
 - **Raw data tabs (done)** — `raw_youtube_posts`, `raw_instagram_posts`, `raw_facebook_posts`, `raw_tiktok_posts` (one per platform, all clients mixed together with a `client` column), plus `raw_aesthetician_ga_store`, `raw_chiropractor_conversion`, `raw_real_estate_conversion`, `raw_vlogger_monetization`, `raw_anomaly_metadata`. All lowercase_with_underscores, exact CSV filenames.
 - **Staging tabs (done)** — `stg_posts` (all 4 platform tabs stacked, 2,933 rows), `stg_posts_daily` (grouped to one row per date+client, 1,826 rows — sparse, only dates a client actually posted), `stg_conversions` (the 4 conversion tabs stacked with a manually-added client label, 2,924 rows — dense, every date × every client), `stg_followers_by_platform` (9 client-platform pairs, each in its own merged-label 2-column block, used specifically for follower forward-fill — see §12).
 - **Master Data tab (done)** — `master_data`, one row per (date, client), 2,924 rows: `date`, `client`, `total_followers`, `reach_views`, `total_engagements`, `engagement_rate`, `follower_growth`, `primary_outcome_count`, `primary_outcome_label`. Built via `QUERY`/`SUMIF`/`LOOKUP` chains, not Apps Script — Apps Script is reserved for §7's add-ons, not the core merge layer.
-- **Dashboard tab (in progress)** — client-selector dropdown showing pretty display names ("Aesthetician," "Real Estate Agent," etc.) that translate to the internal snake_case key via a hidden `VLOOKUP` cell — **done**. Date-range picker with fixed calendar-period presets (2024, 2025, each quarter, All Time, Custom with a real calendar-picker + locale-correct validated bounds) — **done**. KPI cards pulling filtered numbers from Master Data via the selected client + date range — **next**.
-- **Report Generator (Apps Script)** — reads the currently selected client, exports a formatted, client-specific report on demand — **built.** Menu-driven ("Reports" custom menu), single source-of-truth read (`readCurrentSnapshot()`) shared by both snapshot logging and PDF export so they can never drift apart. Snapshots append to `report_log` with colors baked in at write-time via `setBackground()` (not live conditional formatting), matching the dashboard's exact threshold bands.
-- Aesthetician's GA/store section appears only when that client is selected — expected asymmetry, not a bug to hide. **Built.** 7-field summary (Total Sessions, Social/Non-Social Mix, Non-Social & Social Conversion Rate, Revenue, AOV, Orders Shortfall vs. Baseline) on `dashboard!F5:G12`, fully `IF($B$2="aesthetician", ..., "")`-wrapped including labels (not just values — an early version left labels static, corrected). Revenue and AOV also carry prior-year + % change columns (H/I). Social Conversion Rate and Orders Shortfall carry YoY-based conditional-formatting flags (same ±5%/±15% bands as the KPI cards); a 3-tier fill (no-fill for non-aesthetician, gray for aesthetician-but-no-prior-year, then green/yellow/red) replaced an earlier 2-tier version that conflated those two states. Section background color (headers/non-flagged cells) uses `=$B$2="aesthetician"` as a conditional-formatting rule rather than static fill, so it reacts correctly to the dropdown instead of staying colored for every client.
+- **Dashboard tab (done)** — client-selector dropdown showing pretty display names ("Aesthetician," "Real Estate Agent," etc.) that translate to the internal snake_case key via a hidden `VLOOKUP` cell. Date-range picker with fixed calendar-period presets (2024, 2025, each quarter, All Time, Custom with a real calendar-picker + locale-correct validated bounds). Six KPI cards pulling filtered numbers from Master Data via the selected client + date range.
+- **Report Generator (Apps Script)** — reads the currently selected client, exports a formatted, client-specific report on demand. Menu-driven ("Reports" custom menu), single source-of-truth read (`readCurrentSnapshot()`) shared by both snapshot logging and PDF export so they can never drift apart. Snapshots append to `report_log` with colors baked in at write-time via `setBackground()` (not live conditional formatting), matching the dashboard's exact threshold bands.
+- Aesthetician's GA/store section appears only when that client is selected — expected asymmetry, not a bug to hide. 7-field summary (Total Sessions, Social/Non-Social Mix, Non-Social & Social Conversion Rate, Revenue, AOV, Orders Shortfall vs. Baseline) on `dashboard!F5:G12`, fully `IF($B$2="aesthetician", ..., "")`-wrapped including labels (not just values — an early version left labels static, corrected). Revenue and AOV also carry prior-year + % change columns (H/I). Social Conversion Rate and Orders Shortfall carry YoY-based conditional-formatting flags (same ±5%/±15% bands as the KPI cards); a 3-tier fill (no-fill for non-aesthetician, gray for aesthetician-but-no-prior-year, then green/yellow/red) replaced an earlier 2-tier version that conflated those two states. Section background color (headers/non-flagged cells) uses `=$B$2="aesthetician"` as a conditional-formatting rule rather than static fill, so it reacts correctly to the dropdown instead of staying colored for every client.
 
 **Date-range picker UX addition (beyond original scope):** switching to "Custom" now triggers an Apps Script `onEdit` prompt flow — asks for start date, then end date, in a strictly validated `yyyy-mm-dd` format (regex-checked, explicit example using day 31 to avoid month/day ambiguity), writes them into the custom-input cells, and clears those cells automatically when switching away from "Custom" to any preset. Fixes a real bug where stale custom dates caused divide-by-zero crashes across both the KPI cards and the GA/store section when switching from Custom to a preset without manually clearing the custom cells first.
 
@@ -89,25 +88,23 @@ One deep full-funnel flagship + three lightweight, business-relevant conversion 
 1. **Auto-alert on KPI dip** — **built.** Reframed from "runs on refresh" to a manual menu trigger ("Check All Clients for Alerts") once it became clear daily/scheduled alerts don't make sense against a frozen dataset — a scheduled check would just re-report the same result every time. Sends **4 independent, per-client emails** (not one combined alert), each only when that specific client has a real red flag on the most recently completed quarter (computed directly from `master_data`, independent of whatever's currently selected on the dashboard) — a client's stakeholder should only see their own numbers. Recipients configurable per client via `CLIENT_EMAILS`.
 2. **Auto-export report as PDF** — **built.** Reads the live dashboard state directly (shares `readCurrentSnapshot()` with the snapshot logger, so PDF and log can never show different numbers), builds a temporary formatted one-page sheet (dark header band, client name, period, colored KPI table matching the dashboard's flag colors, top-left anchored with internally centered/padded table cells per final design), exports via the spreadsheet's PDF export endpoint, saves to Drive, deletes the temp sheet. Completes the original "one-click, client-ready" pitch for real.
 3. **Posting-cadence vs. performance correlation** — **built**, see full write-up below.
-4. **Auto-refresh trigger** — **cut, deliberately.** Originally scoped as a Build Phase 7 item alongside the other three. On inspection, "auto-refresh" presumes live data to refresh into — this dataset is a static, one-time synthetic import with no new rows ever arriving, so there's nothing for a refresh to actually do. Reframing it as "a scheduled trigger that re-runs the alert/snapshot functions on a timer" was considered and rejected too, since a timer re-checking a frozen dataset only ever produces the same result — automation with no real function to serve. Cut for the same reason rolling date windows and a 3rd synthetic data year were cut earlier in this project: a technically-present feature with no functional purpose isn't worth building just for scope completeness. The honest gap is itself documented here as the interview answer.
+4. **Auto-refresh trigger** — **cut, deliberately.** Originally scoped as a Build Phase 7 item alongside the other three. On inspection, "auto-refresh" presumes live data to refresh into — this dataset is a static, one-time synthetic import with no new rows ever arriving, so there's nothing for a refresh to actually do. Reframing it as "a scheduled trigger that re-runs the alert/snapshot functions on a timer" was considered and rejected too, since a timer re-checking a frozen dataset only ever produces the same result — automation with no real function to serve. Cut for the same reason rolling date windows and a 3rd synthetic data year were cut earlier in this project: a technically-present feature with no functional purpose isn't worth building just for scope completeness.
 
-**Built as:** `stg_posting_cadence` (weekly post_count + reach/engagement rollups per client, grouped via `QUERY` off a Monday-anchored `week_start` helper column in `stg_posts`) feeding two views — a dashboard-dropdown-reactive `QUERY`-pivot in `correlation_view` (dynamic, follows `$B$2`), plus a literal native Sheets pivot table (`pivot_posting_cadence`) as a secondary artifact for interview purposes, since a real pivot table's filter can't natively follow a cell reference.
+**Built as:** `stg_posting_cadence` (weekly post_count + reach/engagement rollups per client, grouped via `QUERY` off a Monday-anchored `week_start` helper column in `stg_posts`) feeding two views — a dashboard-dropdown-reactive `QUERY`-pivot in `correlation_view` (dynamic, follows `$B$2`), plus a literal native Sheets pivot table (`pivot_posting_cadence`) as a secondary reference artifact, since a real pivot table's filter can't natively follow a cell reference.
 
 **Findings, checked across all 4 clients (real signal, not a bug):**
 - **Aesthetician** — near-flat posting cadence (mostly 6–8/week), engagement rate choppy but not clearly tracking post count. Weak/no visible correlation.
 - **Chiropractor & Real Estate Agent** — cadence varies more week to week (2–4 range), and engagement rate shows more visible co-movement with it than the aesthetician does. Best candidates for a "here's where it shows up" example.
 - **Vlogger** — posting cadence is a flat, unchanging 15/week across the entire 2-year range. No variance in the x-axis means correlation is **undefined for this client**, not just weak — there's structurally nothing to correlate engagement rate against.
 
-**Interview framing:** the relationship between posting cadence and performance isn't universal — it depends on whether a given client's posting behavior actually varies at all. A client on a fixed schedule (vlogger) makes the question inapplicable, not just unanswered. This is a more nuanced, defensible finding than a single blanket "cadence doesn't matter" takeaway, and it's consistent with (not a repeat of) the Tableau project's cadence-independent finding.
+**Takeaway:** the relationship between posting cadence and performance isn't universal — it depends on whether a given client's posting behavior actually varies at all. A client on a fixed schedule (vlogger) makes the question inapplicable, not just unanswered. This is a more nuanced, defensible finding than a single blanket "cadence doesn't matter" takeaway, and it's consistent with (not a repeat of) the Tableau project's cadence-independent finding.
 
 ## 8. Tool note: Google Sheets vs Excel
 
 No functional loss for what this project needs:
 - XLOOKUP, INDEX-MATCH, pivot tables, conditional formatting — all native, no compromise
 - No GUI "Power Query" — but `QUERY()` (SQL-like, cell-native) + Apps Script cover cleaning/merging, arguably with more flexibility
-- Macros → Apps Script (JS-based) — a stronger resume signal than VBA macro-recording, and supports time-based triggers (auto-refresh without the file open), which VBA can't do standalone
-
-**Resume framing note:** write "Apps Script-based data cleaning/ETL and automation," not "Power Query" — accurate to what was actually built, and arguably a more credible signal.
+- Macros → Apps Script (JS-based) — full programmatic control instead of VBA macro-recording, and supports time-based triggers (auto-refresh without the file open), which VBA can't do standalone
 
 ## 9. Baseline metrics & posting cadence (finalized)
 
@@ -147,18 +144,18 @@ Per-post reach/views and engagement-rate baselines are derived proportionally fr
 
 ## 10. Project structure (local + GitHub — single unified layout)
 
-**Documentation plan (finalized):** every doc goes in `docs/` (local-only, gitignored) except `README.md`, which lives at the repo root and is the only public one. Six docs currently, each with a distinct job — no overlap.
+**Documentation plan (as published):** `reporting-automation-spec.md` (this doc), `python_cheat_sheet.md`, and `google_sheets_cheat_sheet.md` live in `docs/` and ship to GitHub. `python_deep_dive.md` and `cheat_sheet.md` stay local-only, excluded via `.gitignore`. `README.md` lives at the repo root as the single public-facing landing page.
 
-| File | Purpose | When it's written | GitHub? |
-|---|---|---|---|
-| `spec.md` | This doc — every decision made, why, project structure. The "what and why." | Living — updated throughout | Local-only — personal working doc |
-| `python_deep_dive.md` | Cell-by-cell code walkthrough for personal learning — what each function does, how it works, plus reasoning Q&A (design questions asked and answered along the way, e.g. "why is social's share not guaranteed to rise with follower growth"). Not interview-facing — this is a study doc. | Built alongside the notebook, cell by cell — **complete, all 17 cells** | Local-only — personal study doc |
-| `python_cheat_sheet.md` | ELI5-level teaching doc covering everything the notebook does — every concept explained from first principles (what/how/why/where/when), not assuming prior familiarity. Distinct from `python_deep_dive.md`: the deep-dive is a build log with reasoning Q&A for someone who already watched it get built; the cheat sheet teaches the finished code to someone seeing it cold. | Written once data generation was fully complete | Local-only — personal study doc |
-| `google_sheets_cheat_sheet.md` | Same ELI5 teaching approach, for the Sheets/formula side — started now, updated incrementally as each new stage of the dashboard gets built, rather than written all at once at the end. | Living — started during the Sheets build, not deferred to Build Phase 9 | Local-only — personal study doc |
-| `cheat_sheet.md` | Interview prep — every question a reviewer could ask after seeing the resume line, the dashboard, or the code itself. Interview-facing, not a learning doc — distinct from the two ELI5 docs above. | Build phase 9 — needs a finished dashboard to prep real questions about | Local-only — personal prep doc |
-| `README.md` | Project overview + link to the published Sheet, for anyone landing on the GitHub repo. | Build phase 9 — needs the published link | **Public** — the only doc that ships to GitHub |
+| File | Purpose | GitHub? |
+|---|---|---|
+| `reporting-automation-spec.md` | This doc — every decision made, why, and the project structure. | Public — `docs/` |
+| `python_deep_dive.md` | Cell-by-cell code walkthrough — what each function does, how it works, plus reasoning notes from along the way. | Local-only |
+| `python_cheat_sheet.md` | Teaching-style doc covering everything the notebook does, explained from first principles for anyone reading the code cold. | Public — `docs/` |
+| `google_sheets_cheat_sheet.md` | Same teaching approach for the Sheets/formula side — every technique used across the dashboard build. | Public — `docs/` |
+| `cheat_sheet.md` | Personal reference notes. | Local-only |
+| `README.md` | Project overview + links to the live dashboard and the other two projects in the series. | **Public** — repo root |
 
-One consistent naming scheme used identically on-device and on GitHub — no renaming step before publishing, since that renaming step was what caused the publishing error when the RFM project's folder was moved. This structure is initialized as-is and pushed directly, no restructuring at publish time.
+One consistent naming scheme used identically on-device and on GitHub — no renaming step before publishing, since that renaming step was what caused a publishing error on an earlier project when its folder was moved.
 
 ```
 reporting-automation-dashboard/
@@ -173,24 +170,23 @@ reporting-automation-dashboard/
 │   │                       three clients (same kind of data as ga_store, sibling folder)
 │   └── anomaly_metadata.csv  → spans all four clients, sits at the data/ root
 ├── notebooks/            → data_generation.ipynb — the standalone data-generation notebook
-├── apps-script/          → .gs file(s), once the Sheets/Apps Script layer is built — manually
-│                           copied out of the Apps Script editor to keep in sync
-├── docs/                 → LOCAL-ONLY, gitignored — all .md files except README.md:
-│                           spec.md (this doc), python_deep_dive.md (cell-by-cell code
-│                           walkthrough + reasoning Q&A), python_cheat_sheet.md and
-│                           google_sheets_cheat_sheet.md (ELI5 teaching docs),
-│                           cheat_sheet.md (interview prep)
-├── images/               → graphs plotted in the notebook (PNGs) + dashboard screenshots,
-│                           gathered near the end — GitHub inclusion still undecided
+├── apps_script/          → report_generator.gs — Report Generator, PDF export, email alerts,
+│                           custom-date onEdit trigger, manually copied out of the bound
+│                           Apps Script editor to keep in sync
+├── docs/                 → reporting-automation-spec.md (this doc), python_cheat_sheet.md,
+│                           google_sheets_cheat_sheet.md — public. python_deep_dive.md and
+│                           cheat_sheet.md stay local-only, excluded via .gitignore
+├── images/
+│   ├── dashboard/        → screenshots of the live dashboard (KPI cards, YoY formatting,
+│   │                       Report Generator output, GA/store section, etc.)
+│   └── python_charts/    → seasonality/anomaly plots generated in the notebook
 ├── .venv/                → local-only, gitignored
-├── .gitignore            → excludes .venv/ and docs/
-└── README.md             → project overview + link to the live, view-only published Google
-                            Sheet — the only doc that's public, lives at repo root, not in docs/
+├── .gitignore            → excludes .venv/, docs/python_deep_dive.md, docs/cheat_sheet.md
+└── README.md             → project overview + links to the live dashboard and the other
+                            two projects in the series — the repo's landing page
 ```
 
 Data organized **by platform** (not by client) — one folder per platform, all clients mixed inside with a `Client` column — matches how the raw tabs in Sheets will actually be structured, keeping local files and Sheets tabs mentally 1:1.
-
-**Open question — `images/` on GitHub:** not yet decided whether the plotted PNGs get pushed publicly alongside the notebook/README, or stay local-only like `docs/`. Revisit at publish time.
 
 Local path: `T7 Shield/Work 2nd/Projects/reporting-automation-dashboard/`
 GitHub: `kartik720/reporting-automation-dashboard` (own repo, sibling to `rfm-segmentation` and `marketing-analytics-dashboard`)
@@ -210,7 +206,7 @@ Per-client realistic anomalies, not one shared "bad month" event — same delibe
 - **One anomaly type per client**, staggered across both years (2024: real estate; 2025: the other three, spread Feb/Mar/Nov) so no two compete for attention in the same stretch and YoY comparisons still carry signal.
 - **Two anomalies target the top of the funnel** (posting cessation + inquiry suppression: chiropractor, real estate), **one targets the bottom** (aesthetician — sessions/traffic left completely untouched, only conversion rate suppressed) — deliberately different shapes, not the same mechanism copy-pasted three times.
 - **Real estate's closed_deals required binomial thinning, not an independent Poisson redraw.** Rare-event caveat: closed_deals is ~0.03–0.09/day baseline, and an independent redraw at a lower lambda isn't guaranteed to go down — it can land higher by pure chance (confirmed: it did, on the first attempt). Thinning the *original* draws by the suppression ratio can only ever reduce the count, and is the more mechanistically honest model besides.
-- **Aesthetician's shock exposed a real analysis trap, deliberately kept rather than avoided:** the window overlaps BFCM, where the traffic surge (+58%) is large enough to roughly cancel out the ~48% conversion suppression numerically — actual daily orders stay *flat* through the shock, not visibly down. Added an `orders_expected_baseline` / `orders_shortfall` counterfactual column pair (actual sessions × original conversion rate) specifically so the effect is visible and honest instead of hidden by the raw orders trendline. This is arguably the most interesting chart of the three anomalies for an interview: "why doesn't the orders chart show the problem, and what would?"
+- **Aesthetician's shock exposed a real analysis trap, deliberately kept rather than avoided:** the window overlaps BFCM, where the traffic surge (+58%) is large enough to roughly cancel out the ~48% conversion suppression numerically — actual daily orders stay *flat* through the shock, not visibly down. Added an `orders_expected_baseline` / `orders_shortfall` counterfactual column pair (actual sessions × original conversion rate) specifically so the effect is visible and honest instead of hidden by the raw orders trendline.
 - **Cells 13–15 mutate data in place** (see the reproducibility note above) — not safely re-runnable without a full kernel restart.
 - **Cell 16** combines all four clients' anomaly metadata (including the vlogger's, assembled for the first time from Cell 5's constants) into one `anomaly_metadata_df`, with a `suppression_multiplier` column pulled directly from each cell's own variables (not hand-retyped, so it can't drift out of sync) and a Gantt-style timeline plot confirming no overlap/clustering.
 
@@ -237,8 +233,8 @@ Worth remembering beyond this project, not just project-specific trivia:
 5. ~~Pivot tables + KPI dashboard, dropdown-driven per client, with date-range picker (§6)~~ ✅ **DONE.** Dashboard tab's data-selection layer (client dropdown + date-range picker) built and tested; all 6 KPI cards built and verified across every client/date combination with no errors.
 6. ~~Conditional formatting KPI flag rules~~ ✅ **DONE.** YoY-based red/yellow/green/gray flags on all 6 KPI cards, absolute-referenced and single-cell scoped after catching the relative-reference/combined-range bug (see §12).
 7. ~~Apps Script: one-click report generator, PDF export, email alert on dip~~ ✅ **DONE**, all three. Auto-refresh (originally scoped here) was **cut** — see §7 note. Also includes an unscoped addition: an `onEdit`-triggered custom-date-range prompt flow with strict `yyyy-mm-dd` format validation, fixing a real divide-by-zero crash on stale custom date cells.
-8. ~~Posting-cadence correlation view~~ ✅ **DONE.** `stg_posting_cadence` staging tab, dashboard-reactive `QUERY`-pivot in `correlation_view` with a dual-axis combo chart, plus a literal native pivot table (`pivot_posting_cadence`) as a secondary interview artifact. Findings checked and documented across all 4 clients — see §7.
-9. Polish, publish, resume bullets, cheat sheet — **the notebook markdown-cleanup pass is DONE**, and the notebook was further rebuilt as a fully standalone document with zero cross-references to any external doc (spec, deep-dive) — every markdown cell and code comment that named a spec section or another file was rewritten. Code comments are standardized to a consistent `# ---- Section ----` header style throughout. `python_cheat_sheet.md` is **DONE**. `google_sheets_cheat_sheet.md` is **living, updated throughout the build** — now also needs a final pass reflecting Phases 5–8. A full per-sheet number-formatting and conditional-formatting pass, plus uniform column/row sizing (150px columns, 25px rows, 35px header rows) across every tab, was completed as unscoped polish. **`cheat_sheet.md` and `README.md` are the only remaining items** — the dashboard is now fully built, so both are unblocked and ready to start.
+8. ~~Posting-cadence correlation view~~ ✅ **DONE.** `stg_posting_cadence` staging tab, dashboard-reactive `QUERY`-pivot in `correlation_view` with a dual-axis combo chart, plus a literal native pivot table (`pivot_posting_cadence`) as a secondary reference artifact. Findings checked and documented across all 4 clients — see §7.
+9. ~~Polish, publish, documentation~~ ✅ **DONE.** Notebook markdown-cleanup pass completed — rebuilt as a fully standalone document with zero cross-references to any external doc, every markdown cell and code comment naming a spec section or another file rewritten, code comments standardized to a consistent `# ---- Section ----` header style throughout. A full per-sheet number-formatting and conditional-formatting pass, plus uniform column/row sizing (150px columns, 25px rows, 35px header rows), completed as unscoped polish. All docs finalized; repo published to GitHub.
 
 ---
-*Living document — update as decisions change during the build. Build Phases (§12) stays as the last section on every future update.*
+*Living document — update as decisions change during the build. Build Phases (§13) stays as the last section on every future update.*
