@@ -14,7 +14,7 @@ Tableau Marketing Analytics Dashboard
 this project targets spreadsheet engineering and workflow automation
 specifically.
 
-**[Open the live Sheets dashboard →](https://docs.google.com/spreadsheets/d/1QoUyExvuSc7Q-9Rwma-AdPDiGOgiB44eRMSqh-ZAytI/edit?usp=sharing)**
+**Open the live Sheets dashboard → [Reporting Automation Dashboard] (https://docs.google.com/spreadsheets/d/1QoUyExvuSc7Q-9Rwma-AdPDiGOgiB44eRMSqh-ZAytI/edit?usp=sharing)
 
 ---
 
